@@ -31,6 +31,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		//描画開始
 		dxCommon->PreDraw();
 
+		//ここに描画処理
+
 		//ゲームシーンの描画
 		gameScene->Draw();
 
