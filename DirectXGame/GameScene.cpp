@@ -16,18 +16,20 @@ GameScene::~GameScene() {
 	}
 	worldTransformBlocks_.clear();
 	delete debugCamera_;
+	delete modelSkydome_;
 }
 
 void GameScene::Initialize() {
-	// テクスチャ読み込み
-	playerTextureHandle_ = TextureManager::Load("uvChecker.png");
+	//// テクスチャ読み込み
+	//playerTextureHandle_ = TextureManager::Load("uvChecker.png");
 	// 3Dモデルの生成
-	modelPlayer = Model::Create();
+	modelPlayer = Model::CreateFromOBJ("player",true);
 	modelBlock_ = Model::Create();
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	// カメラの初期化
+	camera_.farZ = 10000.0f;
 	camera_.Initialize();
 
 	// デバッグカメラの生成
@@ -36,7 +38,7 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer, playerTextureHandle_, &camera_);
+	player_->Initialize(modelPlayer, &camera_);
 
 	// 要素数
 	const uint32_t kNumBlockVirtical = 10;
@@ -54,7 +56,7 @@ void GameScene::Initialize() {
 	// キューブの生成
 	for (uint32_t i = 0; i < kNumBlockVirtical; ++i) {
 		for (uint32_t j = 0; j < kNumBlockHorizontal; ++j) {
-			if ((i + j) % 2 == 0) {
+			if ((i + j) % 2 == 1) {
 				worldTransformBlocks_[i][j] = new WorldTransform();
 				worldTransformBlocks_[i][j]->Initialize();
 				worldTransformBlocks_[i][j]->translation_.x = kBlockWidth * j;
@@ -62,6 +64,15 @@ void GameScene::Initialize() {
 			}
 		}
 	}
+
+	// === 天球 ========================================================================
+
+	// 3Dモデルの生成
+	modelSkydome_ = Model::CreateFromOBJ("fireFlyIV", true);
+	// 生成
+	skydome_ = new Skydome();
+	// 初期化
+	skydome_->Initialize(modelSkydome_, &camera_);
 }
 
 void GameScene::Update() {
@@ -82,6 +93,9 @@ void GameScene::Update() {
 			worldTransformBlock->TransferMatrix();
 		}
 	}
+
+	// 天球更新処理
+	skydome_->Update();
 
 #ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
@@ -116,6 +130,8 @@ void GameScene::Draw() {
 			modelBlock_->Draw(*worldTransformBlock, camera_);
 		}
 	}
+
+	skydome_->Draw();
 
 	Model::PostDraw();
 }

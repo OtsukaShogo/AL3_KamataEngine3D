@@ -1,20 +1,19 @@
 #pragma once
 #include"KamataEngine.h"
 
-class Player 
-{
-public:
+/// <summary>
+/// 天球
+/// </summary>
+class Skydome {
 
-	Player();
-	~Player();
+public:
+	Skydome();
+	~Skydome();
 
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	/// <param name="model">モデル</param>
-	/// <param name="textureHandle">テクスチャハンドル</param>
-	/// <param name="camera">カメラ</param>
-	void Initialize(KamataEngine::Model*model,KamataEngine::Camera*camera);
+	void Initialize(KamataEngine::Model* model,KamataEngine::Camera* camera);
 
 	/// <summary>
 	/// 更新
@@ -34,6 +33,6 @@ private:
 	//モデル
 	KamataEngine::Model* model_ = nullptr;
 
-	//カメラ
+	// カメラ
 	KamataEngine::Camera* camera_ = nullptr;
 };

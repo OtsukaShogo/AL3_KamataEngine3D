@@ -2,6 +2,7 @@
 #include "KamataEngine.h"
 #include"Player.h"
 #include<vector>
+#include"Skydome.h"
 
 // ゲームシーン
 class GameScene {
@@ -22,8 +23,8 @@ public:
 
 private:
 
-	//テクスチャハンドル
-	uint32_t playerTextureHandle_ = 0;
+	////テクスチャハンドル
+	//uint32_t playerTextureHandle_ = 0;
 	
 	//3Dモデル
 	KamataEngine::Model* modelPlayer = nullptr;
@@ -45,4 +46,9 @@ private:
 	bool isDebugCameraActive_ = false;
 	//デバッグカメラ
 	KamataEngine::DebugCamera* debugCamera_ = nullptr;
+
+	//天球
+	Skydome* skydome_ = nullptr;
+	//3Dモデル
+	KamataEngine::Model* modelSkydome_ = nullptr;
 };

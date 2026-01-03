@@ -1,24 +1,23 @@
-#include "Player.h"
-#include <cassert>
+#include "Skydome.h"
 #include"AffineMatrix.h"
 
-Player::Player() {};
+Skydome::Skydome() {}
 
-Player::~Player() {}
+Skydome::~Skydome() {}
 
-void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera) {
-	// NULLポインタチェック
+void Skydome::Initialize(KamataEngine::Model* model,KamataEngine::Camera* camera) {
+
 	assert(model);
 
-	// 引数として受け取ったデータをメンバ変数に記録する
 	model_ = model;
 	camera_ = camera;
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
+	worldTransform_.scale_ = {500.0f, 500.0f, 500.0f};
 }
 
-void Player::Update() {
+void Skydome::Update() {
 	// アフィン変換行列の作成
 	KamataEngine::Matrix4x4 affineMatrix = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 
@@ -28,7 +27,7 @@ void Player::Update() {
 	worldTransform_.TransferMatrix();
 }
 
-void Player::Draw() {
-	// 3Dモデルを描画
+void Skydome::Draw() {
+	//3Dモデルの描画
 	model_->Draw(worldTransform_, *camera_);
 }
