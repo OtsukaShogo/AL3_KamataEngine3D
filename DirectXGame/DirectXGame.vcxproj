@@ -155,6 +155,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AffineMatrix.cpp" />
+    <ClCompile Include="Easing.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapChipField.cpp" />
@@ -261,6 +262,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AffineMatrix.h" />
+    <ClInclude Include="Easing.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="Player.h" />

@@ -38,8 +38,11 @@ void GameScene::Initialize() {
 
 	// 自キャラの生成
 	player_ = new Player();
+
+	//座標をマップチップ番号で指定
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 17);
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer, &camera_);
+	player_->Initialize(modelPlayer, &camera_,playerPosition);
 
 	// === 天球 ========================================================================
 
