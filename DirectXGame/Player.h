@@ -4,6 +4,8 @@
 class Player {
 
 public:
+	enum class LRDirection { kRight, kLeft };
+
 	Player();
 	~Player();
 
@@ -27,17 +29,19 @@ public:
 
 	static inline const float kAcceleration = 0.1f;
 	static inline const float kAttenution = 0.2f;
-	static inline const float kLimitRunSpeed = 5.0f;
-	//旋回時間<秒>
+	static inline const float kLimitRunSpeed = 15.0f;
+	// 旋回時間<秒>
 	static inline const float kTimeTurn = 0.3f;
-	//重力加速度
+	// 重力加速度
 	static inline const float kGravityAcceleration = 9.8f;
-	//最大落下速度
+	// 最大落下速度
 	static inline const float kLimitFallSpeed = 20.0f;
-	//ジャンプ初速
+	// ジャンプ初速
 	static inline const float kJumpAcceleration = 1.0f;
 
-	enum class LRDirection { kRight, kLeft };
+	KamataEngine::WorldTransform const& GetWorldTransform() const { return worldTransform_; }
+
+	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
 
 private:
 	// ワールド変換データ
@@ -58,6 +62,6 @@ private:
 	// 旋回タイマー
 	float turnTimer_ = 0.0f;
 
-	//接地状態フラグ
+	// 接地状態フラグ
 	bool onGround_ = true;
 };

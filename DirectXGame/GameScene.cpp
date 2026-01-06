@@ -39,10 +39,10 @@ void GameScene::Initialize() {
 	// 自キャラの生成
 	player_ = new Player();
 
-	//座標をマップチップ番号で指定
+	// 座標をマップチップ番号で指定
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 17);
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer, &camera_,playerPosition);
+	player_->Initialize(modelPlayer, &camera_, playerPosition);
 
 	// === 天球 ========================================================================
 
@@ -59,6 +59,14 @@ void GameScene::Initialize() {
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 
 	GenerateBlocks();
+
+	// カメラコントローラ
+	cameraController_ = new CameraController();
+	cameraController_->Initialize(&camera_);
+	cameraController_->SetTarget(player_);
+	cameraController_->Reset();
+	// 範囲の指定
+	cameraController_->SetMovableArea({10.0f, 100.0f, 5.0f, 20.0f});
 }
 
 void GameScene::Update() {
@@ -83,9 +91,12 @@ void GameScene::Update() {
 	// 天球更新処理
 	skydome_->Update();
 
+	// カメラコントローラ更新
+	cameraController_->Update();
+
 #ifdef _DEBUG
 	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
-		isDebugCameraActive_ = true;
+		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 #endif
 
@@ -98,6 +109,7 @@ void GameScene::Update() {
 	} else {
 		// ビュープロジェクション行列の更新と転送
 		camera_.UpdateMatrix();
+		camera_.UpdateViewMatrix();
 	}
 }
 
@@ -142,7 +154,7 @@ void GameScene::GenerateBlocks() {
 				WorldTransform* worldTransform = new WorldTransform();
 				worldTransform->Initialize();
 				worldTransformBlocks_[i][j] = worldTransform;
-				worldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j,i);
+				worldTransformBlocks_[i][j]->translation_ = mapChipField_->GetMapChipPositionByIndex(j, i);
 			}
 		}
 	}

@@ -7,3 +7,5 @@ float EaseInOutQuad(float t) {
 		return 1.0f - (-2.0f * t + 2.0f) * (-2.0f * t + 2.0f) / 2.0f;
 	}
 }
+
+float Lerp(float a, float b, float t) { return a + (b - a) * t; }
