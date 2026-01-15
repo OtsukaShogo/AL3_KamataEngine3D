@@ -25,24 +25,16 @@ void GameScene::Initialize() {
 	// playerTextureHandle_ = TextureManager::Load("uvChecker.png");
 	//  3Dモデルの生成
 	modelPlayer = Model::CreateFromOBJ("player", true);
-	modelBlock_ = Model::Create();
+	modelBlock_ = Model::CreateFromOBJ("block",true);
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	// カメラの初期化
-	camera_.farZ = 10000.0f;
+	camera_.farZ = 1200.0f;
 	camera_.Initialize();
 
 	// デバッグカメラの生成
 	debugCamera_ = new DebugCamera(1280, 720);
-
-	// 自キャラの生成
-	player_ = new Player();
-
-	// 座標をマップチップ番号で指定
-	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 17);
-	// 自キャラの初期化
-	player_->Initialize(modelPlayer, &camera_, playerPosition);
 
 	// === 天球 ========================================================================
 
@@ -59,6 +51,14 @@ void GameScene::Initialize() {
 	mapChipField_->LoadMapChipCsv("Resources/blocks.csv");
 
 	GenerateBlocks();
+
+	// 自キャラの生成
+	player_ = new Player();
+	// 座標をマップチップ番号で指定
+	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
+	// 自キャラの初期化
+	player_->Initialize(modelPlayer, &camera_, playerPosition);
+	player_->SetMapChipField(mapChipField_);
 
 	// カメラコントローラ
 	cameraController_ = new CameraController();

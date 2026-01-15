@@ -13,6 +13,19 @@ struct MapChipDate {
 class MapChipField {
 public:
 
+	struct IndexSet {
+		uint32_t xIndex;
+		uint32_t yIndex;
+	};
+
+	//範囲矩形
+	struct Rect {
+		float left;//左端
+		float right;//右端
+		float bottom;//左端
+		float top;//上端
+	};
+
 	MapChipField();
 	~MapChipField();
 
@@ -26,6 +39,10 @@ public:
 
 	uint32_t GetNumBlockVirtical() const { return kNumBlockVirtical; }
 	uint32_t GetNumBlockHorizontal() const { return kNumBlockHorizontal; }
+
+	IndexSet GetMapChipIndexSetByPosition(const KamataEngine::Vector3& position);
+
+	Rect GetRectByIndex(uint32_t xIndex, uint32_t yIndex);
 
 	// 1ブロックのサイズ
 	static inline const float kBlockWidth = 1.0f;

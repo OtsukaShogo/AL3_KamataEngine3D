@@ -1,10 +1,30 @@
 #pragma once
 #include "KamataEngine.h"
 
+class MapChipField;
+
 class Player {
 
 public:
 	enum class LRDirection { kRight, kLeft };
+
+	// マップとの当たり判定
+	struct CollisionMapInfo {
+		bool isCeilingHit = false;
+		bool isGrounded = false;
+		bool isWallHit = false;
+		KamataEngine::Vector3 moveAmount;
+	};
+
+	//角
+	enum Corner {
+		kRightBottom,//右下
+		kLeftBottom,//左下
+		kRightTop,//右上
+		kLeftTop,//左上
+
+		kNumCorner//要素数
+	};
 
 	Player();
 	~Player();
@@ -22,6 +42,21 @@ public:
 	/// </summary>
 	void Update();
 
+	void MoveInput();
+
+	void CheckMapCollision(CollisionMapInfo& info);
+
+	void TopCheckMapCollision(CollisionMapInfo& info);
+	/*void BottomCheckMapCollision(CollisionMapInfo& info);
+	void RightCheckMapCollision(CollisionMapInfo& info);
+	void LeftCheckMapCollision(CollisionMapInfo& info);*/
+
+	void MoveAfterCollisionCheck(const CollisionMapInfo& info);
+
+	 void CeilingHitMove(const CollisionMapInfo& info);
+
+	KamataEngine::Vector3 CornerPosition(const KamataEngine::Vector3& center, Corner corner);
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -33,15 +68,23 @@ public:
 	// 旋回時間<秒>
 	static inline const float kTimeTurn = 0.3f;
 	// 重力加速度
-	static inline const float kGravityAcceleration = 9.8f;
+	static inline const float kGravityAcceleration = 2.0f;
 	// 最大落下速度
 	static inline const float kLimitFallSpeed = 20.0f;
 	// ジャンプ初速
-	static inline const float kJumpAcceleration = 1.0f;
+	static inline const float kJumpAcceleration = 0.5f;
+
+	//キャラクターの当たり判定サイズ
+	static inline const float kWidth = 0.8f;
+	static inline const float kHeight = 0.8f;
+
+	static inline const float kBlank = 0.001f;
 
 	KamataEngine::WorldTransform const& GetWorldTransform() const { return worldTransform_; }
 
 	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
+
+	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField_ = mapChipField; }
 
 private:
 	// ワールド変換データ
@@ -64,4 +107,7 @@ private:
 
 	// 接地状態フラグ
 	bool onGround_ = true;
+
+	// マップチップによるフィールド
+	MapChipField* mapChipField_ = nullptr;
 };
