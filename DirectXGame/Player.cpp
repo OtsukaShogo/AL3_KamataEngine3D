@@ -407,6 +407,15 @@ void Player::ChengeGroundedState(const CollisionMapInfo& info) {
 			//   移動後の4つの角の座標
 			std::array<KamataEngine::Vector3, kNumCorner> positionNew;
 
+			KamataEngine::Vector3 pos = worldTransform_.translation_;
+			pos.x += info.moveAmount.x;
+			pos.y += info.moveAmount.y;
+			pos.z += info.moveAmount.z;
+
+			for (uint32_t i = 0; i < positionNew.size(); ++i) {
+				positionNew[i] = CornerPosition(pos, static_cast<Corner>(i));
+			}
+
 			MapChipType mapChipType;
 			// 真下の当たり判定を行う
 			bool hit = false;
