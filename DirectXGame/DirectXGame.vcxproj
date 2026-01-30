@@ -157,6 +157,7 @@
     <ClCompile Include="AffineMatrix.cpp" />
     <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Easing.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapChipField.cpp" />
@@ -265,6 +266,7 @@
     <ClInclude Include="AffineMatrix.h" />
     <ClInclude Include="CameraController.h" />
     <ClInclude Include="Easing.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="Player.h" />

@@ -5,6 +5,7 @@
 #include"Skydome.h"
 #include"MapChipField.h"
 #include"CameraController.h"
+#include"Enemy.h"
 
 // ゲームシーン
 class GameScene {
@@ -29,10 +30,6 @@ private:
 
 	////テクスチャハンドル
 	//uint32_t playerTextureHandle_ = 0;
-	
-	//3Dモデル
-	KamataEngine::Model* modelPlayer = nullptr;
-	KamataEngine::Model* modelBlock_ = nullptr;
 
 	//ワールドトランスフォーム
 	KamataEngine::WorldTransform worldTransform_;
@@ -42,9 +39,18 @@ private:
 
 	//自キャラ
 	Player* player_ = nullptr;
+	// 3Dモデル
+	KamataEngine::Model* modelPlayer_= nullptr;
 
 	//ブロック
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
+	// 3Dモデル
+	KamataEngine::Model* modelBlock_ = nullptr;
+
+	//雑魚敵
+	Enemy* enemy_ = nullptr;
+	// 3Dモデル
+	KamataEngine::Model* modelEnemy_ = nullptr;
 
 	//デバッグカメラ有効
 	bool isDebugCameraActive_ = false;

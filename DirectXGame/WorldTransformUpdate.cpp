@@ -1,5 +1,4 @@
 #include "WorldTransformUpdate.h"
-#include "AffineMatrix.h"
 
 void WorldTransformUpdate(KamataEngine::WorldTransform& worldTransform) {
 	// スケール、回転、平行移動を合成して行列を計算する

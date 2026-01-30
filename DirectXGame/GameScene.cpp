@@ -6,17 +6,24 @@ using namespace KamataEngine;
 GameScene::GameScene() {};
 
 GameScene::~GameScene() {
-	delete modelPlayer;
-	delete modelBlock_;
+	delete modelPlayer_;
 	delete player_;
+
+	delete modelBlock_;
 	for (std::vector<WorldTransform*> worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
 			delete worldTransformBlock;
 		}
 	}
 	worldTransformBlocks_.clear();
+
+	delete modelEnemy_;
+	delete enemy_;
+
 	delete debugCamera_;
+
 	delete modelSkydome_;
+
 	delete mapChipField_;
 }
 
@@ -24,8 +31,9 @@ void GameScene::Initialize() {
 	//// テクスチャ読み込み
 	// playerTextureHandle_ = TextureManager::Load("uvChecker.png");
 	//  3Dモデルの生成
-	modelPlayer = Model::CreateFromOBJ("player", true);
+	modelPlayer_ = Model::CreateFromOBJ("player", true);
 	modelBlock_ = Model::CreateFromOBJ("block",true);
+	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -57,8 +65,15 @@ void GameScene::Initialize() {
 	// 座標をマップチップ番号で指定
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer, &camera_, playerPosition);
+	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 	player_->SetMapChipField(mapChipField_);
+
+	//雑魚敵の生成
+	enemy_ = new Enemy();
+	//座標をマップチップ番号で指定
+	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15, 18);
+	//雑魚敵の初期化
+	enemy_->Initialize(modelEnemy_, &camera_, enemyPosition);
 
 	// カメラコントローラ
 	cameraController_ = new CameraController();
@@ -87,6 +102,9 @@ void GameScene::Update() {
 			worldTransformBlock->TransferMatrix();
 		}
 	}
+
+	//雑魚敵の更新
+	enemy_->Update();
 
 	// 天球更新処理
 	skydome_->Update();
@@ -128,6 +146,9 @@ void GameScene::Draw() {
 			modelBlock_->Draw(*worldTransformBlock, camera_);
 		}
 	}
+
+	//雑魚敵描画
+	enemy_->Draw();
 
 	skydome_->Draw();
 
