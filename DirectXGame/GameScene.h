@@ -26,6 +26,9 @@ public:
 
 	void GenerateBlocks();
 
+	//すべての当たり判定を行う
+	void CheckAllCollisons();
+
 private:
 
 	////テクスチャハンドル
@@ -48,7 +51,7 @@ private:
 	KamataEngine::Model* modelBlock_ = nullptr;
 
 	//雑魚敵
-	Enemy* enemy_ = nullptr;
+	std::list<Enemy*> enemies_;
 	// 3Dモデル
 	KamataEngine::Model* modelEnemy_ = nullptr;
 

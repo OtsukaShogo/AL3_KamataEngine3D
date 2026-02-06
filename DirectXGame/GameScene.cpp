@@ -18,7 +18,11 @@ GameScene::~GameScene() {
 	worldTransformBlocks_.clear();
 
 	delete modelEnemy_;
-	delete enemy_;
+	for (Enemy* newEnemy : enemies_) {
+		delete newEnemy;
+	}
+
+	enemies_.clear();
 
 	delete debugCamera_;
 
@@ -32,7 +36,7 @@ void GameScene::Initialize() {
 	// playerTextureHandle_ = TextureManager::Load("uvChecker.png");
 	//  3Dモデルの生成
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
-	modelBlock_ = Model::CreateFromOBJ("block",true);
+	modelBlock_ = Model::CreateFromOBJ("block", true);
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 
 	// ワールドトランスフォームの初期化
@@ -68,12 +72,16 @@ void GameScene::Initialize() {
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 	player_->SetMapChipField(mapChipField_);
 
-	//雑魚敵の生成
-	enemy_ = new Enemy();
-	//座標をマップチップ番号で指定
-	Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15, 18);
-	//雑魚敵の初期化
-	enemy_->Initialize(modelEnemy_, &camera_, enemyPosition);
+	// 雑魚敵の生成
+	for (int32_t i = 0; i < 3; ++i) {
+		Enemy* newEnemy = new Enemy();
+		// 座標をマップチップ番号で指定
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15 + i, 18);
+		// 雑魚敵の初期化
+		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
+
+		enemies_.push_back(newEnemy);
+	}
 
 	// カメラコントローラ
 	cameraController_ = new CameraController();
@@ -103,11 +111,17 @@ void GameScene::Update() {
 		}
 	}
 
-	//雑魚敵の更新
-	enemy_->Update();
+	// 雑魚敵の更新
+	for (Enemy* newEnemy : enemies_) {
+		newEnemy->Update();
+	}
 
 	// 天球更新処理
 	skydome_->Update();
+
+	// === 当たり判定 ===============================
+
+	CheckAllCollisons();
 
 	// カメラコントローラ更新
 	cameraController_->Update();
@@ -147,8 +161,10 @@ void GameScene::Draw() {
 		}
 	}
 
-	//雑魚敵描画
-	enemy_->Draw();
+	// 雑魚敵描画
+	for (Enemy* newEnemy : enemies_) {
+		newEnemy->Draw();
+	}
 
 	skydome_->Draw();
 
@@ -179,4 +195,30 @@ void GameScene::GenerateBlocks() {
 			}
 		}
 	}
+}
+
+void GameScene::CheckAllCollisons() {
+#pragma region 自キャラと敵キャラの当たり判定
+	{
+		// 判定対象1と2の座標
+		AABB aabb1, aabb2;
+
+		//自キャラの座標
+		aabb1 = player_->GetAABB();
+
+		//自キャラと敵すべての当たり判定
+		for (Enemy* enemy : enemies_) {
+		//敵の座標
+			aabb2 = enemy->GetAABB();
+
+			//AABB同士の交差判定
+			if (CheckHitAABB(aabb1, aabb2)) {
+				// 自キャラの衝突時交差判定
+				player_->OnCollision(enemy);
+				// 敵の衝突時関数を呼び出す
+				enemy->OnCollision(player_);
+			}
+		}
+	}
+#pragma endregion
 }
