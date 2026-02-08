@@ -9,6 +9,8 @@ GameScene::~GameScene() {
 	delete modelPlayer_;
 	delete player_;
 
+	delete deathParticles_;
+
 	delete modelBlock_;
 	for (std::vector<WorldTransform*> worldTransformBlockLine : worldTransformBlocks_) {
 		for (WorldTransform* worldTransformBlock : worldTransformBlockLine) {
@@ -38,6 +40,7 @@ void GameScene::Initialize() {
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
 	modelBlock_ = Model::CreateFromOBJ("block", true);
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
+	modelDeathParticle_ = Model::CreateFromOBJ("deathParticle", true);
 
 	// ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
@@ -72,11 +75,15 @@ void GameScene::Initialize() {
 	player_->Initialize(modelPlayer_, &camera_, playerPosition);
 	player_->SetMapChipField(mapChipField_);
 
+	//仮の生成処理 後で消す
+	deathParticles_ = new DeathParticles;
+	deathParticles_->Initialize(modelDeathParticle_, &camera_, playerPosition);
+
 	// 雑魚敵の生成
 	for (int32_t i = 0; i < 3; ++i) {
 		Enemy* newEnemy = new Enemy();
 		// 座標をマップチップ番号で指定
-		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(15 + i, 18);
+		Vector3 enemyPosition = mapChipField_->GetMapChipPositionByIndex(30 + i, 18);
 		// 雑魚敵の初期化
 		newEnemy->Initialize(modelEnemy_, &camera_, enemyPosition);
 
@@ -93,8 +100,17 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
+
+	if (KamataEngine::Input::GetInstance()->PushKey(DIK_R)) {
+		Initialize();
+	}
+
 	// 自キャラの更新
 	player_->Update();
+
+	if (deathParticles_) {
+		deathParticles_->Update();
+	}
 
 	// ブロックの更新
 	for (std::vector<WorldTransform*> worldTransformBlockLine : worldTransformBlocks_) {
@@ -150,6 +166,11 @@ void GameScene::Draw() {
 
 	// 自キャラの描画
 	player_->Draw();
+
+	if (deathParticles_) {
+		deathParticles_->Draw();
+	}
+
 
 	// ブロックの描画
 	for (std::vector<WorldTransform*> worldTransformBlockLine : worldTransformBlocks_) {

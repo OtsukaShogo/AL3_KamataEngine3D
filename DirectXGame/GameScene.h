@@ -6,6 +6,7 @@
 #include"MapChipField.h"
 #include"CameraController.h"
 #include"Enemy.h"
+#include "DeathParticles.h"
 
 // ゲームシーン
 class GameScene {
@@ -45,6 +46,11 @@ private:
 	// 3Dモデル
 	KamataEngine::Model* modelPlayer_= nullptr;
 
+	//デス演出用パーティクル
+	DeathParticles* deathParticles_ = nullptr;
+	//3Dモデル
+	KamataEngine::Model* modelDeathParticle_;
+
 	//ブロック
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 	// 3Dモデル
@@ -70,4 +76,5 @@ private:
 
 	//カメラコントローラ
 	CameraController* cameraController_;
+
 };

@@ -37,3 +37,39 @@ KamataEngine::Matrix4x4 MakeAffineMatrix(KamataEngine::Vector3 scale, KamataEngi
 
 	return result;
 }
+
+KamataEngine::Matrix4x4 MakeRotateZMatrix(float angle) {
+	KamataEngine::Matrix4x4 result{};
+
+	result.m[0][0] = std::cos(angle);
+	result.m[0][1] = -std::sin(angle);
+	result.m[0][2] = 0.0f;
+	result.m[0][3] = 0.0f;
+
+	result.m[1][0] = std::sin(angle);
+	result.m[1][1] = std::cos(angle);
+	result.m[1][2] = 0.0f;
+	result.m[1][3] = 0.0f;
+
+	result.m[2][0] = 0.0f;
+	result.m[2][1] = 0.0f;
+	result.m[2][2] = 1.0f;
+	result.m[2][3] = 0.0f;
+
+	result.m[3][0] = 0.0f;
+	result.m[3][1] = 0.0f;
+	result.m[3][2] = 0.0f;
+	result.m[3][3] = 1.0f;
+
+	return result;
+}
+
+KamataEngine::Vector3 Transform(const KamataEngine::Vector3& v, const KamataEngine::Matrix4x4& m) {
+	KamataEngine::Vector3 result{};
+
+	result.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + m.m[3][0];
+	result.y = v.x * m.m[0][1] + v.y * m.m[1][1] + v.z * m.m[2][1] + m.m[3][1];
+	result.z = v.x * m.m[0][2] + v.y * m.m[1][2] + v.z * m.m[2][2] + m.m[3][2];
+
+	return result;
+}
