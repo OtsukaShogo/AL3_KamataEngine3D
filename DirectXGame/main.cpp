@@ -1,5 +1,6 @@
 #include "KamataEngine.h"
 #include <Windows.h>
+#include"TitleScene.h"
 #include"GameScene.h"
 
 using namespace KamataEngine;
@@ -13,6 +14,12 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// DirectXCommonインスタンスの取得
 	DirectXCommon* dxCommon = DirectXCommon::GetInstance();
 
+	//タイトルシーンのインスタンス生成
+	TitleScene* titleScene = nullptr;
+	titleScene = new TitleScene();
+	//タイトルシーンの初期化
+	titleScene->Initialize();
+
 	//ゲームシーンのインスタンス生成
 	GameScene* gameScene = new GameScene();
 	//ゲームシーンの初期化
@@ -24,6 +31,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		if (KamataEngine::Update()) {
 			break;
 		}
+
+		//タイトルシーンの更新
+		titleScene->Update();
 
 		//ゲームシーンの更新
 		gameScene->Update();
