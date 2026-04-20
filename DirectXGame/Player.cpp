@@ -504,6 +504,6 @@ AABB Player::GetAABB() {
 
 void Player::OnCollision(const Enemy* enemy) { 
 	(void)enemy;
-	//ジャンプ開始
-	velocity_ += KamataEngine::Vector3(0.0f,kJumpAcceleration,0.0f);
+	//デスフラグを立てる
+	isDead_ = true;
 }

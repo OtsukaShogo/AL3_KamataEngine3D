@@ -1,6 +1,6 @@
 #pragma once
+#include "Collision.h"
 #include "KamataEngine.h"
-#include"Collision.h"
 
 class MapChipField;
 
@@ -45,6 +45,32 @@ public:
 	/// </summary>
 	void Update();
 
+	/// <summary>
+	/// 描画
+	/// </summary>
+	void Draw();
+
+	// 衝突応答
+	void OnCollision(const Enemy* enemy);
+
+	// === ゲッター ==============================
+
+	KamataEngine::WorldTransform const& GetWorldTransform() const { return worldTransform_; }
+
+	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
+
+	KamataEngine::Vector3 GetWorldPosition();
+
+	AABB GetAABB();
+
+	//デスフラグ
+	bool GetIsDead_() const { return isDead_; }
+
+	// === セッター ==============================
+
+	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField_ = mapChipField; }
+
+private:
 	void MoveInput();
 
 	/// <summary>
@@ -76,28 +102,6 @@ public:
 
 	void HitWall(const CollisionMapInfo& info);
 
-	/// <summary>
-	/// 描画
-	/// </summary>
-	void Draw();
-
-	//衝突応答
-	void OnCollision(const Enemy* enemy);
-
-	// === ゲッター ==============================
-
-	KamataEngine::WorldTransform const& GetWorldTransform() const { return worldTransform_; }
-
-	const KamataEngine::Vector3& GetVelocity() const { return velocity_; }
-
-	KamataEngine::Vector3 GetWorldPosition();
-
-	AABB GetAABB();
-
-	// === セッター ==============================
-
-	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField_ = mapChipField; }
-
 private:
 	// ワールド変換データ
 	KamataEngine::WorldTransform worldTransform_;
@@ -122,6 +126,9 @@ private:
 
 	// マップチップによるフィールド
 	MapChipField* mapChipField_ = nullptr;
+
+	// デスフラグ
+	bool isDead_ = false;
 
 	// === 定数 ================================================
 

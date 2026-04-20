@@ -16,43 +16,82 @@
     <Filter Include="シェーダー ファイル">
       <UniqueIdentifier>{718c7f4c-fc51-40ad-a221-b9456a7a1a3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\Matrix">
+      <UniqueIdentifier>{d652ca0d-fbce-4bee-a26d-37cdfd2905c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Player">
+      <UniqueIdentifier>{822eb61d-8328-4c19-927c-cf49cbec13b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\MapChip">
+      <UniqueIdentifier>{4ddfe102-5b40-45dd-904b-0f477f502ae9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Camera">
+      <UniqueIdentifier>{34caf728-cda1-4f39-aac2-1d62394a35e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Collision">
+      <UniqueIdentifier>{b3f234e9-2273-4eb9-8d3c-ad7eb55004f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\DeathParticle">
+      <UniqueIdentifier>{e36ef302-3764-4275-9095-fc56a9c6a69a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Easing">
+      <UniqueIdentifier>{cb6f0582-6b04-4d79-8ff7-ab6b57e3d21f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Enemy">
+      <UniqueIdentifier>{55045ebc-71a1-4460-b9ec-08bd6d8af09a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Skydome">
+      <UniqueIdentifier>{68cb9a1d-84de-4597-970f-feecfbcf9fe0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Scene">
+      <UniqueIdentifier>{0be36557-8e7c-43de-a769-cc00560439e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Scene\GameScene">
+      <UniqueIdentifier>{0445f576-6fe6-43a0-ae83-ec1dc43b1496}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Scene\TitleScene">
+      <UniqueIdentifier>{f27f61a4-382c-4e4d-a8d8-66eeacb86eef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Skydome.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Scene\GameScene</Filter>
     </ClCompile>
     <ClCompile Include="AffineMatrix.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Matrix</Filter>
     </ClCompile>
-    <ClCompile Include="WorldTransformUpdate.cpp">
-      <Filter>ソース ファイル</Filter>
+    <ClCompile Include="Player.cpp">
+      <Filter>ソース ファイル\Player</Filter>
     </ClCompile>
     <ClCompile Include="MapChipField.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Easing.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\MapChip</Filter>
     </ClCompile>
     <ClCompile Include="CameraController.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Camera</Filter>
     </ClCompile>
     <ClCompile Include="Collision.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\Collision</Filter>
     </ClCompile>
     <ClCompile Include="DeathParticles.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\DeathParticle</Filter>
+    </ClCompile>
+    <ClCompile Include="Easing.cpp">
+      <Filter>ソース ファイル\Easing</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>ソース ファイル\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Skydome.cpp">
+      <Filter>ソース ファイル\Skydome</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldTransformUpdate.cpp">
+      <Filter>ソース ファイル\Matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="TitleScene.cpp">
+      <Filter>ソース ファイル\Scene\TitleScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -106,37 +145,40 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameScene.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\Scene\GameScene</Filter>
     </ClInclude>
     <ClInclude Include="AffineMatrix.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\Matrix</Filter>
     </ClInclude>
-    <ClInclude Include="Skydome.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldTransformUpdate.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Player.h">
+      <Filter>ソース ファイル\Player</Filter>
     </ClInclude>
     <ClInclude Include="MapChipField.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Easing.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\MapChip</Filter>
     </ClInclude>
     <ClInclude Include="CameraController.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="Enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\Camera</Filter>
     </ClInclude>
     <ClInclude Include="Collision.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\Collision</Filter>
     </ClInclude>
     <ClInclude Include="DeathParticles.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル\DeathParticle</Filter>
+    </ClInclude>
+    <ClInclude Include="Easing.h">
+      <Filter>ソース ファイル\Easing</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>ソース ファイル\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Skydome.h">
+      <Filter>ソース ファイル\Skydome</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldTransformUpdate.h">
+      <Filter>ソース ファイル\Matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="TitleScene.h">
+      <Filter>ソース ファイル\Scene\TitleScene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

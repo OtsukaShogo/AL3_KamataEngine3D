@@ -1,18 +1,23 @@
 #pragma once
-#include "KamataEngine.h"
-#include"Player.h"
-#include<vector>
-#include"Skydome.h"
-#include"MapChipField.h"
-#include"CameraController.h"
-#include"Enemy.h"
+#include "CameraController.h"
 #include "DeathParticles.h"
+#include "Enemy.h"
+#include "KamataEngine.h"
+#include "MapChipField.h"
+#include "Player.h"
+#include "Skydome.h"
+#include <vector>
+
+// ゲームのフェーズ
+enum class Phase {
+	kPlay,  // ゲームプレイ
+	kDeath, // デス演出
+};
 
 // ゲームシーン
 class GameScene {
 
 public:
-
 	GameScene();
 	~GameScene();
 
@@ -25,56 +30,70 @@ public:
 	// 描画
 	void Draw();
 
+private:
 	void GenerateBlocks();
 
-	//すべての当たり判定を行う
+	// すべての当たり判定を行う
 	void CheckAllCollisons();
 
+	//カメラの更新
+	void CameraUpdate();
+
+	//ブロックの更新
+	void BlockUpdate();
+
+	//ブロックの描画
+	void BlockDraw();
+
+	//フェーズ切り替え
+	void ChangePhase();
+
 private:
-
 	////テクスチャハンドル
-	//uint32_t playerTextureHandle_ = 0;
+	// uint32_t playerTextureHandle_ = 0;
 
-	//ワールドトランスフォーム
+	// ワールドトランスフォーム
 	KamataEngine::WorldTransform worldTransform_;
 
-	//カメラ
+	// カメラ
 	KamataEngine::Camera camera_;
 
-	//自キャラ
+	// 自キャラ
 	Player* player_ = nullptr;
 	// 3Dモデル
-	KamataEngine::Model* modelPlayer_= nullptr;
+	KamataEngine::Model* modelPlayer_ = nullptr;
 
-	//デス演出用パーティクル
+	// デス演出用パーティクル
 	DeathParticles* deathParticles_ = nullptr;
-	//3Dモデル
+	// 3Dモデル
 	KamataEngine::Model* modelDeathParticle_;
 
-	//ブロック
+	// ブロック
 	std::vector<std::vector<KamataEngine::WorldTransform*>> worldTransformBlocks_;
 	// 3Dモデル
 	KamataEngine::Model* modelBlock_ = nullptr;
 
-	//雑魚敵
+	// 雑魚敵
 	std::list<Enemy*> enemies_;
 	// 3Dモデル
 	KamataEngine::Model* modelEnemy_ = nullptr;
 
-	//デバッグカメラ有効
+	// デバッグカメラ有効
 	bool isDebugCameraActive_ = false;
-	//デバッグカメラ
+	// デバッグカメラ
 	KamataEngine::DebugCamera* debugCamera_ = nullptr;
 
-	//天球
+	// 天球
 	Skydome* skydome_ = nullptr;
-	//3Dモデル
+	// 3Dモデル
 	KamataEngine::Model* modelSkydome_ = nullptr;
 
-	//マップチップフィールド
+	// マップチップフィールド
 	MapChipField* mapChipField_;
 
-	//カメラコントローラ
+	// カメラコントローラ
 	CameraController* cameraController_;
 
+	// ゲームの現在のフェーズ
+	Phase phase_;
 };
