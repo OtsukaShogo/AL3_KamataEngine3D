@@ -130,7 +130,7 @@ void Player::MoveInput() {
 
 		if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_UP)) {
 			// ジャンプ初速
-			velocity_.y = kJumpAcceleration;
+			velocity_.y += kJumpAcceleration;
 		}
 
 		// 空中
