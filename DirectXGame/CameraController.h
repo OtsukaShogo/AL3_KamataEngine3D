@@ -1,8 +1,13 @@
 #pragma once
-#include"KamataEngine.h"
+#include "KamataEngine.h"
 
-//前方宣言
+// 前方宣言
 class Player;
+
+enum class Mode {
+	kFollow,       // プレイヤー追従
+	kForcedScroll, // 強制スクロール
+};
 
 /// <summary>
 /// カメラコントローラ
@@ -10,7 +15,7 @@ class Player;
 class CameraController {
 
 public:
-	//矩形
+	// 矩形
 	struct Rect {
 		float left = 0.0f;
 		float right = 1.0f;
@@ -33,32 +38,43 @@ public:
 
 	void Reset();
 
+public:
 	void SetTarget(Player* target) { target_ = target; }
 
 	void SetMovableArea(Rect area) { movableArea_ = area; }
 
-	//座標補間割合
+	void SetMode(Mode mode) { mode_ = mode; }
+	Mode GetMode() const { return mode_; }
+
+	// 座標補間割合
 	static inline const float kInterpolationRate = 0.1f;
 
-	//速度掛け率
+	// 速度掛け率
 	static inline const float kVelocityBias = 20.0f;
 
-	//追従対象の各方向へのカメラ移動範囲
+	// 強制スクロール速度
+	static inline const float kScrollSpeed = 0.1f;
+
+	// 追従対象の各方向へのカメラ移動範囲
 	static inline const Rect margin = {-10.0f, 15.0f, -10.0f, 15.0f};
 
-private:
+	// 強制スクロール中のプレイヤー拘束範囲（カメラ中心からのオフセット）
+	static inline const Rect scrollPlayerMargin = {-10.0f, 10.0f, -10.0f, 10.0f};
 
-	//カメラ
+private:
+	Mode mode_ = Mode::kFollow;
+
+	// カメラ
 	KamataEngine::Camera* camera_;
 
 	Player* target_ = nullptr;
 
-	//追従対象とカメラの座標の差(オフセット)
+	// 追従対象とカメラの座標の差(オフセット)
 	KamataEngine::Vector3 targetOffset_ = {0.0f, 0.0f, -15.0f};
 
-	//カメラ移動範囲
+	// カメラ移動範囲
 	Rect movableArea_ = {0.0f, 100.0f, 0.0f, 100.0f};
 
-	//カメラの目的座標
+	// カメラの目的座標
 	KamataEngine::Vector3 targetPos_;
 };

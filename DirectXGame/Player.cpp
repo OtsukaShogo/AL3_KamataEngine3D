@@ -45,6 +45,8 @@ void Player::Update() {
 	// マップ衝突チェック
 	CheckMapCollision(collisionMapInfo);
 
+	isRightWallHit_ = collisionMapInfo.isRightWallHit;
+
 	MoveAfterCollisionCheck(collisionMapInfo);
 
 	CeilingHitMove(collisionMapInfo);
@@ -308,8 +310,8 @@ void Player::RightCheckMapCollision(CollisionMapInfo& info) {
 			// めり込み先ブロックの範囲矩形
 			MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
 			info.moveAmount.x = std::min(0.0f, (rect.left - worldTransform_.translation_.x) - (kWidth / 2.0f + kBlank));
-			// 地面に当たったことを記憶する
 			info.isWallHit = true;
+			info.isRightWallHit = true;
 		}
 	}
 }
@@ -365,6 +367,24 @@ void Player::LeftCheckMapCollision(CollisionMapInfo& info) {
 			// 地面に当たったことを記憶する
 			info.isWallHit = true;
 		}
+	}
+}
+
+void Player::CheckCameraSqueezeCollision() {
+	KamataEngine::Vector3 rightTop    = CornerPosition(worldTransform_.translation_, kRightTop);
+	KamataEngine::Vector3 rightBottom = CornerPosition(worldTransform_.translation_, kRightBottom);
+
+	MapChipField::IndexSet indexSet;
+
+	indexSet = mapChipField_->GetMapChipIndexSetByPosition(rightTop);
+	if (mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex) == MapChipType::kBlock) {
+		isDead_ = true;
+		return;
+	}
+
+	indexSet = mapChipField_->GetMapChipIndexSetByPosition(rightBottom);
+	if (mapChipField_->GetMapChipTypeByIndex(indexSet.xIndex, indexSet.yIndex) == MapChipType::kBlock) {
+		isDead_ = true;
 	}
 }
 
