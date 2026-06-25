@@ -16,6 +16,7 @@ public:
 		bool isCeilingHit = false;
 		bool isGrounded = false;
 		bool isWallHit = false;
+		bool isRightWallHit = false;
 		KamataEngine::Vector3 moveAmount;
 	};
 
@@ -69,6 +70,11 @@ public:
 	// === セッター ==============================
 
 	void SetMapChipField(MapChipField* mapChipField) { this->mapChipField_ = mapChipField; }
+
+	void SetPositionX(float x) { worldTransform_.translation_.x = x; }
+
+	// カメラ押し出し後に呼ぶ。右側にブロックがあれば挟まれ死亡
+	void CheckCameraSqueezeCollision();
 
 private:
 	void MoveInput();
@@ -129,6 +135,9 @@ private:
 
 	// デスフラグ
 	bool isDead_ = false;
+
+	// 右壁衝突フラグ
+	bool isRightWallHit_ = false;
 
 	// === 定数 ================================================
 

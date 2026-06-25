@@ -93,6 +93,8 @@ void GameScene::Initialize() {
 	cameraController_->Reset();
 	// 範囲の指定
 	cameraController_->SetMovableArea({10.0f, 100.0f, 5.0f, 20.0f});
+	// 強制スクロール有効化
+	cameraController_->SetMode(Mode::kForcedScroll);
 
 	// ゲームプレイフェーズから開始
 	phase_ = Phase::kPlay;
