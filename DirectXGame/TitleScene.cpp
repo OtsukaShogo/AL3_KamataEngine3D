@@ -11,6 +11,7 @@ TitleScene::~TitleScene() {
 	delete modelPlayer_;
 	delete modelTitle_;
 	delete debugCamera_;
+	delete fade_;
 }
 
 void TitleScene::Initialize() {
@@ -33,14 +34,13 @@ void TitleScene::Initialize() {
 
 	titleAnimTimer_ = 0.0f;
 	titleAnimForward_ = true;
+
+	fade_ = new Fade();
+	fade_->Initialize();
+	fade_->Start(Fade::Status::FadeIn, kFadeDuration);
 }
 
 void TitleScene::Update() {
-
-	//スペースが押されたらタイトルシーン終了
-	if (Input::GetInstance()->PushKey(DIK_SPACE)) {
-		finished_ = true;
-	}
 
 	// デバッグカメラ切り替え
 #ifdef _DEBUG
@@ -58,24 +58,49 @@ void TitleScene::Update() {
 		camera_.UpdateMatrix();
 	}
 
-	// タイトルのイージングアニメーション（往復）
-	float delta = 1.0f / 60.0f / kTitleHalfPeriod;
-	if (titleAnimForward_) {
-		titleAnimTimer_ += delta;
-		if (titleAnimTimer_ >= 1.0f) {
-			titleAnimTimer_ = 1.0f;
-			titleAnimForward_ = false;
+	switch (phase_) {
+	case Phase::kFadeIn:
+		fade_->Update();
+		// フェードイン完了でメインへ
+		if (fade_->IsFinished()) {
+			phase_ = Phase::kMain;
 		}
-	} else {
-		titleAnimTimer_ -= delta;
-		if (titleAnimTimer_ <= 0.0f) {
-			titleAnimTimer_ = 0.0f;
-			titleAnimForward_ = true;
-		}
-	}
+		break;
 
-	// タイトルY座標をイージングで更新
-	worldTransformTitle_.translation_.y = kTitleBaseY + EaseInOutQuad(titleAnimTimer_) * kTitleAmplitude;
+	case Phase::kMain:
+		// タイトルのイージングアニメーション（往復）
+		{
+			float delta = 1.0f / 60.0f / kTitleHalfPeriod;
+			if (titleAnimForward_) {
+				titleAnimTimer_ += delta;
+				if (titleAnimTimer_ >= 1.0f) {
+					titleAnimTimer_ = 1.0f;
+					titleAnimForward_ = false;
+				}
+			} else {
+				titleAnimTimer_ -= delta;
+				if (titleAnimTimer_ <= 0.0f) {
+					titleAnimTimer_ = 0.0f;
+					titleAnimForward_ = true;
+				}
+			}
+			worldTransformTitle_.translation_.y = kTitleBaseY + EaseInOutQuad(titleAnimTimer_) * kTitleAmplitude;
+		}
+		// スペースでフェードアウト開始
+		if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+			phase_ = Phase::kFadeOut;
+			fade_->Start(Fade::Status::FadeOut, kFadeDuration);
+		}
+		break;
+
+	case Phase::kFadeOut:
+		fade_->Update();
+		// フェードアウト完了でシーン終了
+		if (fade_->IsFinished()) {
+			finished_ = true;
+		}
+		break;
+	}
 
 	// ワールド行列更新
 	WorldTransformUpdate(worldTransformPlayer_);
@@ -88,4 +113,7 @@ void TitleScene::Draw() {
 	modelPlayer_->Draw(worldTransformPlayer_, camera_);
 	modelTitle_->Draw(worldTransformTitle_, camera_);
 	Model::PostDraw();
+
+	// フェード描画（スプライトは3Dモデルの後）
+	fade_->Draw();
 }

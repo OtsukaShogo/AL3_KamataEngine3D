@@ -1,10 +1,19 @@
 #pragma once
+#include "Fade.h"
 #include "KamataEngine.h"
 
 /// <summary>
 /// タイトルシーン
 /// </summary>
 class TitleScene {
+
+public:
+	// シーンのフェーズ
+	enum class Phase {
+		kFadeIn,  // フェードイン
+		kMain,    // メイン部
+		kFadeOut, // フェードアウト
+	};
 
 public:
 	TitleScene();
@@ -44,7 +53,14 @@ private:
 	static inline const float kTitleAmplitude = 0.5f;
 	// 半周期（秒）
 	static inline const float kTitleHalfPeriod = 1.0f;
+	// フェード時間（秒）
+	static inline const float kFadeDuration = 1.0f;
 
 	// 終了フラグ
 	bool finished_ = false;
+
+	Fade* fade_ = nullptr;
+
+	//現在のフェーズ
+	Phase phase_ = Phase::kFadeIn;
 };

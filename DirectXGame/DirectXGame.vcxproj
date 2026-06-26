@@ -160,6 +160,7 @@
     <ClCompile Include="DeathParticles.cpp" />
     <ClCompile Include="Easing.cpp" />
     <ClCompile Include="Enemy.cpp" />
+    <ClCompile Include="Fade.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MapChipField.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="DeathParticles.h" />
     <ClInclude Include="Easing.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Fade.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="MapChipField.h" />
     <ClInclude Include="Player.h" />

@@ -31,6 +31,8 @@ GameScene::~GameScene() {
 	delete modelSkydome_;
 
 	delete mapChipField_;
+
+	delete fade_;
 }
 
 void GameScene::Initialize() {
@@ -96,19 +98,33 @@ void GameScene::Initialize() {
 	// 強制スクロール有効化
 	cameraController_->SetMode(Mode::kForcedScroll);
 
-	// ゲームプレイフェーズから開始
-	phase_ = Phase::kPlay;
+	// フェード
+	fade_ = new Fade();
+	fade_->Initialize();
+	fade_->Start(Fade::Status::FadeIn, kFadeDuration);
+
+	// フェードインフェーズから開始
+	phase_ = Phase::kFadeIn;
 }
 
 void GameScene::Update() {
 
-	if (deathParticles_ && deathParticles_->GetIsFinished()) {
-		finished_ = true;
-	}
-
 	ChangePhase();
 
 	switch (phase_) {
+	case Phase::kFadeIn: // フェードインフェーズ
+		// フェード中もオブジェクトの行列を初期化するため通常と同じ更新を行う
+		skydome_->Update();
+		player_->Update();
+		for (Enemy* newEnemy : enemies_) {
+			newEnemy->Update();
+		}
+		cameraController_->Update();
+		CameraUpdate();
+		BlockUpdate();
+		fade_->Update();
+		break;
+
 	case Phase::kPlay: // ゲームプレイフェーズ
 
 		// 天球更新処理
@@ -136,6 +152,7 @@ void GameScene::Update() {
 		CheckAllCollisons();
 
 		break;
+
 	case Phase::kDeath: // デス演出フェーズ
 
 		// 天球更新処理
@@ -158,6 +175,11 @@ void GameScene::Update() {
 		BlockUpdate();
 
 		break;
+
+	case Phase::kFadeOut: // フェードアウトフェーズ
+		fade_->Update();
+		CameraUpdate();
+		break;
 	}
 }
 
@@ -165,7 +187,8 @@ void GameScene::Draw() {
 	Model::PreDraw();
 
 	switch (phase_) {
-	case Phase::kPlay: // ゲームプレイフェーズ
+	case Phase::kFadeIn: // フェードインフェーズ
+	case Phase::kPlay:   // ゲームプレイフェーズ
 
 		skydome_->Draw();
 
@@ -181,7 +204,8 @@ void GameScene::Draw() {
 
 		break;
 
-	case Phase::kDeath: // デス演出フェーズ
+	case Phase::kDeath:   // デス演出フェーズ
+	case Phase::kFadeOut: // フェードアウトフェーズ
 
 		skydome_->Draw();
 
@@ -200,6 +224,9 @@ void GameScene::Draw() {
 	}
 
 	Model::PostDraw();
+
+	// フェード描画（スプライトは3Dモデルの後）
+	fade_->Draw();
 }
 
 void GameScene::GenerateBlocks() {
@@ -308,22 +335,38 @@ void GameScene::BlockDraw() {
 void GameScene::ChangePhase() {
 
 	switch (phase_) {
-	case Phase::kPlay: // ゲームプレイフェーズ
+	case Phase::kFadeIn: // フェードインフェーズ
+		// フェードイン完了でゲームプレイへ
+		if (fade_->IsFinished()) {
+			phase_ = Phase::kPlay;
+		}
+		break;
 
+	case Phase::kPlay: // ゲームプレイフェーズ
 		if (player_->GetIsDead_()) {
 			// 死亡演出フェーズに切り替え
 			phase_ = Phase::kDeath;
 			// 自キャラの座標を取得
 			const Vector3& deathParticlePosition = player_->GetWorldPosition();
-
-			//自キャラの座標にですパーティクルを発生、初期化
+			// デスパーティクルを発生・初期化
 			deathParticles_ = new DeathParticles;
 			deathParticles_->Initialize(modelDeathParticle_, &camera_, deathParticlePosition);
 		}
 		break;
 
 	case Phase::kDeath: // デス演出フェーズ
+		// デスパーティクル完了でフェードアウトへ
+		if (deathParticles_ && deathParticles_->GetIsFinished()) {
+			phase_ = Phase::kFadeOut;
+			fade_->Start(Fade::Status::FadeOut, kFadeDuration);
+		}
+		break;
 
+	case Phase::kFadeOut: // フェードアウトフェーズ
+		// フェードアウト完了でシーン終了
+		if (fade_->IsFinished()) {
+			finished_ = true;
+		}
 		break;
 	}
 }
