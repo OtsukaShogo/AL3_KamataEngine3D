@@ -102,9 +102,8 @@ void GameScene::Initialize() {
 
 void GameScene::Update() {
 
-	// Rキーを押して初期化
-	if (KamataEngine::Input::GetInstance()->PushKey(DIK_R)) {
-		Initialize();
+	if (deathParticles_ && deathParticles_->GetIsFinished()) {
+		finished_ = true;
 	}
 
 	ChangePhase();
@@ -258,7 +257,7 @@ void GameScene::CheckAllCollisons() {
 void GameScene::CameraUpdate() {
 
 #ifdef _DEBUG
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+	if (Input::GetInstance()->TriggerKey(DIK_F1)) {
 		isDebugCameraActive_ = !isDebugCameraActive_;
 	}
 #endif

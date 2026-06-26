@@ -30,6 +30,8 @@ public:
 	/// </summary>
 	void Draw();
 
+	bool GetIsFinished() const { return isFinished_; }
+
 	// === 定数 ========================================
 
 	//パーティクルの個数
