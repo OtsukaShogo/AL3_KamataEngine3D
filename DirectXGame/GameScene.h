@@ -6,12 +6,15 @@
 #include "MapChipField.h"
 #include "Player.h"
 #include "Skydome.h"
+#include"Fade.h"
 #include <vector>
 
 // ゲームのフェーズ
 enum class Phase {
-	kPlay,  // ゲームプレイ
-	kDeath, // デス演出
+	kFadeIn, // フェードイン
+	kPlay,   // ゲームプレイ
+	kDeath,  // デス演出
+	kFadeOut // フェードアウト
 };
 
 // ゲームシーン
@@ -99,6 +102,11 @@ private:
 
 	// ゲームの現在のフェーズ
 	Phase phase_;
+
+	// フェード
+	Fade* fade_ = nullptr;
+	// フェード時間（秒）
+	static inline const float kFadeDuration = 1.0f;
 
 	// 終了フラグ
 	bool finished_ = false;
