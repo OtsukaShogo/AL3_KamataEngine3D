@@ -30,6 +30,9 @@ public:
 	// 描画
 	void Draw();
 
+	// デスフラグのgetter
+	bool IsFinished() const { return finished_; }
+
 private:
 	void GenerateBlocks();
 
@@ -96,4 +99,7 @@ private:
 
 	// ゲームの現在のフェーズ
 	Phase phase_;
+
+	// 終了フラグ
+	bool finished_ = false;
 };
