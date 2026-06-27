@@ -14,17 +14,21 @@ Player::Player() {};
 
 Player::~Player() {}
 
-void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, const KamataEngine::Vector3& position) {
+void Player::Initialize(KamataEngine::Model* model, KamataEngine::Model* modelAttack, KamataEngine::Camera* camera, const KamataEngine::Vector3& position) {
 	// NULLポインタチェック
 	assert(model);
 
 	// 引数として受け取ったデータをメンバ変数に記録する
 	model_ = model;
+	modelAttack_ = modelAttack;
 	camera_ = camera;
 
 	// ワールド変換の初期化
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = position;
+
+	// 攻撃エフェクトのワールド変換初期化
+	worldTransformAttack_.Initialize();
 	// 左右の自キャラ角度テーブル
 	float destinationRotationYTable[] = {std::numbers::pi_v<float> * 3.0f / 2.0f, std ::numbers::pi_v<float> / 2.0f};
 
@@ -33,46 +37,65 @@ void Player::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera
 }
 
 void Player::Update() {
-
-	MoveInput();
-
-	// 衝突情報を初期化
-	CollisionMapInfo collisionMapInfo;
-
-	// 移動量に速度の値をコピー
-	collisionMapInfo.moveAmount = velocity_;
-
-	// マップ衝突チェック
-	CheckMapCollision(collisionMapInfo);
-
-	isRightWallHit_ = collisionMapInfo.isRightWallHit;
-
-	MoveAfterCollisionCheck(collisionMapInfo);
-
-	CeilingHitMove(collisionMapInfo);
-
-	ChengeGroundedState(collisionMapInfo);
-
-	// 旋回制御
-	if (turnTimer_ > 0.0f) {
-		turnTimer_ -= 1.0f / 60.0f;
-
-		// 左右の自キャラ角度テーブル
-		float destinationRotationYTable[] = {std::numbers::pi_v<float> * 3.0f / 2.0f, std ::numbers::pi_v<float> / 2.0f};
-
-		// 状況に応じた角度を取得する
-		float destinationRotationY = destinationRotationYTable[static_cast<uint32_t>(lrDirection_)];
-		// 自キャラの角度を設定する
-		float t = 1.0f - (turnTimer_ / kTimeTurn);
-		worldTransform_.rotation_.y = (1.0f - EaseInOutQuad(t)) * worldTransform_.rotation_.y + EaseInOutQuad(t) * destinationRotationY;
+	// 攻撃キーを押したら
+	if (KamataEngine::Input::GetInstance()->TriggerKey(DIK_SPACE)) {
+		// 攻撃ビヘイビアをリクエスト
+		behaviorRequest_ = Behavior::kAttack;
 	}
 
-	// アフィン変換行列の作成
-	KamataEngine::Matrix4x4 affineMatrix = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
+	if (behaviorRequest_ != Behavior::kUnknown) {
+		// 振るまいを変更する
+		behavior_ = behaviorRequest_;
+		// 各振るまいごとの初期化を実行
+		switch (behavior_) {
+		case Behavior::kRoot:
+		default:
+			// ルートビヘイビアの初期化
+			BehaviorRootInitialize();
 
+			break;
+
+		case Behavior::kAttack:
+			// 攻撃ビヘイビアの初期化
+			BehaviorAttackInitialize();
+
+			break;
+		}
+		// 振るまいリクエストをリセット
+		behaviorRequest_ = Behavior::kUnknown;
+	}
+
+	// 共通: 重力適用
+	if (!onGround_) {
+		velocity_.y += -kGravityAcceleration;
+		velocity_.y = std::max(velocity_.y, -kLimitFallSpeed);
+	}
+
+	// マップ衝突（フラグを毎フレームリセット）
+	CollisionMapInfo collisionMapInfo = {};
+
+	switch (behavior_) {
+		// 通常行動
+	case Behavior::kRoot:
+	default:
+		BehaviorRootUpdate();
+		collisionMapInfo.moveAmount = velocity_;
+		break;
+
+		// 攻撃行動
+	case Behavior::kAttack:
+		BehaviorAttackUpdate(collisionMapInfo);
+		break;
+	}
+	CheckMapCollision(collisionMapInfo);
+	isRightWallHit_ = collisionMapInfo.isRightWallHit;
+	MoveAfterCollisionCheck(collisionMapInfo);
+	CeilingHitMove(collisionMapInfo);
+	ChengeGroundedState(collisionMapInfo);
+
+	// 行列更新
+	Matrix4x4 affineMatrix = MakeAffineMatrix(worldTransform_.scale_, worldTransform_.rotation_, worldTransform_.translation_);
 	worldTransform_.matWorld_ = affineMatrix;
-
-	// 行列を定数バッファに転送
 	worldTransform_.TransferMatrix();
 }
 
@@ -134,13 +157,6 @@ void Player::MoveInput() {
 			// ジャンプ初速
 			velocity_.y += kJumpAcceleration;
 		}
-
-		// 空中
-	} else {
-		// 落下速度
-		velocity_.y += -kGravityAcceleration;
-		// 落下速度制限
-		velocity_.y = std::max(velocity_.y, -kLimitFallSpeed);
 	}
 }
 
@@ -305,7 +321,7 @@ void Player::RightCheckMapCollision(CollisionMapInfo& info) {
 		indexSet = mapChipField_->GetMapChipIndexSetByPosition(positionNew[kRightTop]);
 		// 現在座標が壁の外か判定
 		MapChipField::IndexSet indexSetNow;
-		indexSetNow = mapChipField_->GetMapChipIndexSetByPosition({worldTransform_.translation_.x + kWidth/2.0f, worldTransform_.translation_.y, worldTransform_.translation_.z});
+		indexSetNow = mapChipField_->GetMapChipIndexSetByPosition({worldTransform_.translation_.x + kWidth / 2.0f, worldTransform_.translation_.y, worldTransform_.translation_.z});
 		if (indexSetNow.xIndex != indexSet.xIndex) {
 			// めり込み先ブロックの範囲矩形
 			MapChipField::Rect rect = mapChipField_->GetRectByIndex(indexSet.xIndex, indexSet.yIndex);
@@ -371,7 +387,7 @@ void Player::LeftCheckMapCollision(CollisionMapInfo& info) {
 }
 
 void Player::CheckCameraSqueezeCollision() {
-	KamataEngine::Vector3 rightTop    = CornerPosition(worldTransform_.translation_, kRightTop);
+	KamataEngine::Vector3 rightTop = CornerPosition(worldTransform_.translation_, kRightTop);
 	KamataEngine::Vector3 rightBottom = CornerPosition(worldTransform_.translation_, kRightBottom);
 
 	MapChipField::IndexSet indexSet;
@@ -495,15 +511,19 @@ void Player::HitWall(const CollisionMapInfo& info) {
 }
 
 void Player::Draw() {
-	// 3Dモデルを描画
 	model_->Draw(worldTransform_, *camera_);
+
+	// 攻撃中はエフェクトモデルを前方に描画
+	if (behavior_ == Behavior::kAttack) {
+		modelAttack_->Draw(worldTransformAttack_, *camera_);
+	}
 }
 
 KamataEngine::Vector3 Player::GetWorldPosition() {
-	//ワールド座標を入れる変数
+	// ワールド座標を入れる変数
 	KamataEngine::Vector3 worldPos;
 
-	//ワールド行列の平行移動成分を取得(ワールド座標)
+	// ワールド行列の平行移動成分を取得(ワールド座標)
 	worldPos.x = worldTransform_.matWorld_.m[3][0];
 	worldPos.y = worldTransform_.matWorld_.m[3][1];
 	worldPos.z = worldTransform_.matWorld_.m[3][2];
@@ -511,7 +531,7 @@ KamataEngine::Vector3 Player::GetWorldPosition() {
 	return worldPos;
 }
 
-AABB Player::GetAABB() { 
+AABB Player::GetAABB() {
 	KamataEngine::Vector3 worldPos = GetWorldPosition();
 
 	AABB aabb;
@@ -522,8 +542,108 @@ AABB Player::GetAABB() {
 	return aabb;
 }
 
-void Player::OnCollision(const Enemy* enemy) { 
+void Player::OnCollision(const Enemy* enemy) {
 	(void)enemy;
-	//デスフラグを立てる
+	// デスフラグを立てる
 	isDead_ = true;
+}
+
+void Player::BehaviorRootInitialize() {}
+
+void Player::BehaviorRootUpdate() {
+	MoveInput();
+
+	// 旋回制御
+	if (turnTimer_ > 0.0f) {
+		turnTimer_ -= 1.0f / 60.0f;
+
+		// 左右の自キャラ角度テーブル
+		float destinationRotationYTable[] = {std::numbers::pi_v<float> * 3.0f / 2.0f, std ::numbers::pi_v<float> / 2.0f};
+
+		// 状況に応じた角度を取得する
+		float destinationRotationY = destinationRotationYTable[static_cast<uint32_t>(lrDirection_)];
+		// 自キャラの角度を設定する
+		float t = 1.0f - (turnTimer_ / kTimeTurn);
+		worldTransform_.rotation_.y = (1.0f - EaseInOutQuad(t)) * worldTransform_.rotation_.y + EaseInOutQuad(t) * destinationRotationY;
+	}
+}
+
+void Player::BehaviorAttackInitialize() {
+	attackParameter_ = 0;
+	attackPhase_ = AttackPhase::StartUp;
+}
+
+void Player::BehaviorAttackUpdate(CollisionMapInfo& info) {
+
+	attackParameter_++;
+
+	// 攻撃専用移動速度（velocity_ と分離してカメラ追従に影響させない）
+	KamataEngine::Vector3 attackVelocity = {};
+
+	switch (attackPhase_) {
+		// 溜め動作
+	case AttackPhase::StartUp:
+
+	default: {
+		float t = static_cast<float>(attackParameter_) / kAttackStartUpDuration;
+
+		worldTransform_.scale_.z = EaseOut(1.0f, 0.3f, t);
+		worldTransform_.scale_.y = EaseOut(1.0f, 1.6f, t);
+		// 前進動作へ移行
+		if (attackParameter_ >= kAttackStartUpDuration) {
+			attackPhase_ = AttackPhase::Active;
+			attackParameter_ = 0;
+		}
+		break;
+	}
+
+		// 突進動作
+	case AttackPhase::Active: {
+		float t = static_cast<float>(attackParameter_) / kAttackDuration;
+		worldTransform_.scale_.z = EaseOut(0.3f, 1.3f, t);
+		worldTransform_.scale_.y = EaseIn(1.6f, 0.7f, t);
+		// 余韻動作へ移行
+		if (attackParameter_ >= static_cast<uint32_t>(kAttackDuration)) {
+			attackPhase_ = AttackPhase::Recovery;
+			attackParameter_ = 0;
+		}
+
+		// 向いている方向に一定速度で自動移動
+		if (lrDirection_ == LRDirection::kRight) {
+			attackVelocity.x = kAttackMoveSpeed;
+		} else {
+			attackVelocity.x = -kAttackMoveSpeed;
+		}
+
+		break;
+	}
+
+		// 余韻動作
+	case AttackPhase::Recovery: {
+		float t = static_cast<float>(attackParameter_) / kAttackRecoveryDuration;
+		worldTransform_.scale_.z = EaseOut(1.3f, 1.0f, t);
+		worldTransform_.scale_.y = EaseOut(0.7f, 1.0f, t);
+
+		// 既定の時間経過で攻撃終了して通常状態に戻す
+		if (attackParameter_ >= kAttackRecoveryDuration) {
+			behaviorRequest_ = Behavior::kRoot;
+		}
+
+		break;
+	}
+	}
+
+	// velocity_（カメラ追従用）と attackVelocity（攻撃移動）を合算して moveAmount にセット
+	info.moveAmount = {
+	    velocity_.x + attackVelocity.x,
+	    velocity_.y + attackVelocity.y,
+	    velocity_.z + attackVelocity.z,
+	};
+
+	// 攻撃エフェクトをプレイヤーの前方に配置
+	worldTransformAttack_.translation_ = worldTransform_.translation_;
+	worldTransformAttack_.rotation_ = worldTransform_.rotation_;
+	Matrix4x4 affineMatrixAttack = MakeAffineMatrix(worldTransformAttack_.scale_, worldTransformAttack_.rotation_, worldTransformAttack_.translation_);
+	worldTransformAttack_.matWorld_ = affineMatrixAttack;
+	worldTransformAttack_.TransferMatrix();
 }
