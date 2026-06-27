@@ -30,6 +30,21 @@ public:
 		kNumCorner // 要素数
 	};
 
+	// ふるまい
+	enum class Behavior {
+		kRoot,   // 通常状態
+		kAttack, // 攻撃中
+
+		kUnknown // 不明
+	};
+
+	//攻撃フェーズ
+	enum class AttackPhase {
+		StartUp, // 溜め
+		Active,  // 突進
+		Recovery // 余韻
+	};
+
 	Player();
 	~Player();
 
@@ -39,7 +54,7 @@ public:
 	/// <param name="model">モデル</param>
 	/// <param name="textureHandle">テクスチャハンドル</param>
 	/// <param name="camera">カメラ</param>
-	void Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera, const KamataEngine::Vector3& position);
+	void Initialize(KamataEngine::Model* model, KamataEngine::Model* modelAttack, KamataEngine::Camera* camera, const KamataEngine::Vector3& position);
 
 	/// <summary>
 	/// 更新
@@ -64,7 +79,7 @@ public:
 
 	AABB GetAABB();
 
-	//デスフラグ
+	// デスフラグ
 	bool GetIsDead_() const { return isDead_; }
 
 	// === セッター ==============================
@@ -108,15 +123,28 @@ private:
 
 	void HitWall(const CollisionMapInfo& info);
 
+	void BehaviorRootInitialize();
+	void BehaviorRootUpdate();
+
+	void BehaviorAttackInitialize();
+	void BehaviorAttackUpdate(CollisionMapInfo& info);
+
 private:
-	// ワールド変換データ
-	KamataEngine::WorldTransform worldTransform_;
 
 	// モデル
 	KamataEngine::Model* model_ = nullptr;
+	// ワールド変換データ
+	KamataEngine::WorldTransform worldTransform_;
+
+	//攻撃用モデル
+	KamataEngine::Model* modelAttack_ = nullptr;
+	KamataEngine::WorldTransform worldTransformAttack_;
+
 
 	// カメラ
 	KamataEngine::Camera* camera_ = nullptr;
+
+	//CollisionMapInfo collisionMapInfo_;
 
 	KamataEngine::Vector3 velocity_ = {};
 
@@ -138,6 +166,17 @@ private:
 
 	// 右壁衝突フラグ
 	bool isRightWallHit_ = false;
+
+	// ふるまい
+	Behavior behavior_ = Behavior::kRoot;
+	// 次のふるまいリクエスト
+	Behavior behaviorRequest_ = Behavior::kUnknown;
+
+	//攻撃ギミックの経過時間カウンター
+	uint32_t attackParameter_ = 0;
+
+	//現在の攻撃フェーズ
+	AttackPhase attackPhase_;
 
 	// === 定数 ================================================
 
@@ -167,4 +206,10 @@ private:
 
 	// 衝突時の速度減衰率
 	static inline const float kAttenuationWall = 0.1f;
+	// 攻撃中の移動速度
+	static inline const float kAttackMoveSpeed = 0.3f;
+	//攻撃時間
+	static inline const float kAttackStartUpDuration = 5.0f;
+	static inline const float kAttackDuration = 5.0f;
+	static inline const float kAttackRecoveryDuration = 5.0f;
 };

@@ -68,6 +68,7 @@ private:
 	Player* player_ = nullptr;
 	// 3Dモデル
 	KamataEngine::Model* modelPlayer_ = nullptr;
+	KamataEngine::Model* modelPlayerAttack_ = nullptr;
 
 	// デス演出用パーティクル
 	DeathParticles* deathParticles_ = nullptr;

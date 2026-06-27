@@ -7,6 +7,7 @@ GameScene::GameScene() {};
 
 GameScene::~GameScene() {
 	delete modelPlayer_;
+	delete modelPlayerAttack_;
 	delete player_;
 
 	delete deathParticles_;
@@ -40,6 +41,7 @@ void GameScene::Initialize() {
 	// playerTextureHandle_ = TextureManager::Load("uvChecker.png");
 	//  3Dモデルの生成
 	modelPlayer_ = Model::CreateFromOBJ("player", true);
+	modelPlayerAttack_ = Model::CreateFromOBJ("hit_effect", true);
 	modelBlock_ = Model::CreateFromOBJ("block", true);
 	modelEnemy_ = Model::CreateFromOBJ("enemy", true);
 	modelDeathParticle_ = Model::CreateFromOBJ("deathParticle", true);
@@ -74,7 +76,7 @@ void GameScene::Initialize() {
 	// 座標をマップチップ番号で指定
 	Vector3 playerPosition = mapChipField_->GetMapChipPositionByIndex(2, 18);
 	// 自キャラの初期化
-	player_->Initialize(modelPlayer_, &camera_, playerPosition);
+	player_->Initialize(modelPlayer_, modelPlayerAttack_, &camera_, playerPosition);
 	player_->SetMapChipField(mapChipField_);
 
 	// 雑魚敵の生成
