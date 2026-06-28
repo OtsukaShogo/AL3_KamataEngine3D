@@ -38,7 +38,7 @@ public:
 		kUnknown // 不明
 	};
 
-	//攻撃フェーズ
+	// 攻撃フェーズ
 	enum class AttackPhase {
 		StartUp, // 溜め
 		Active,  // 突進
@@ -69,6 +69,9 @@ public:
 	// 衝突応答
 	void OnCollision(const Enemy* enemy);
 
+	//攻撃しているか
+	bool IsAttack() const;
+
 	// === ゲッター ==============================
 
 	KamataEngine::WorldTransform const& GetWorldTransform() const { return worldTransform_; }
@@ -80,7 +83,7 @@ public:
 	AABB GetAABB();
 
 	// デスフラグ
-	bool GetIsDead_() const { return isDead_; }
+	bool GetIsDead() const { return isDead_; }
 
 	// === セッター ==============================
 
@@ -130,21 +133,19 @@ private:
 	void BehaviorAttackUpdate(CollisionMapInfo& info);
 
 private:
-
 	// モデル
 	KamataEngine::Model* model_ = nullptr;
 	// ワールド変換データ
 	KamataEngine::WorldTransform worldTransform_;
 
-	//攻撃用モデル
+	// 攻撃用モデル
 	KamataEngine::Model* modelAttack_ = nullptr;
 	KamataEngine::WorldTransform worldTransformAttack_;
-
 
 	// カメラ
 	KamataEngine::Camera* camera_ = nullptr;
 
-	//CollisionMapInfo collisionMapInfo_;
+	// CollisionMapInfo collisionMapInfo_;
 
 	KamataEngine::Vector3 velocity_ = {};
 
@@ -172,10 +173,10 @@ private:
 	// 次のふるまいリクエスト
 	Behavior behaviorRequest_ = Behavior::kUnknown;
 
-	//攻撃ギミックの経過時間カウンター
+	// 攻撃ギミックの経過時間カウンター
 	uint32_t attackParameter_ = 0;
 
-	//現在の攻撃フェーズ
+	// 現在の攻撃フェーズ
 	AttackPhase attackPhase_;
 
 	// === 定数 ================================================
@@ -208,7 +209,7 @@ private:
 	static inline const float kAttenuationWall = 0.1f;
 	// 攻撃中の移動速度
 	static inline const float kAttackMoveSpeed = 0.3f;
-	//攻撃時間
+	// 攻撃時間
 	static inline const float kAttackStartUpDuration = 5.0f;
 	static inline const float kAttackDuration = 5.0f;
 	static inline const float kAttackRecoveryDuration = 5.0f;

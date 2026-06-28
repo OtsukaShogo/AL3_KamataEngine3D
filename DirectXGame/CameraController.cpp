@@ -18,7 +18,7 @@ void CameraController::Update() {
 
 	if (mode_ == Mode::kForcedScroll) {
 		// プレイヤーが死亡していたらスクロール停止
-		if (!target_->GetIsDead_()) {
+		if (!target_->GetIsDead()) {
 			// 等速直線運動でスクロール
 			camera_->translation_.x += kScrollSpeed;
 			// ステージ端が画面右端に来たら停止

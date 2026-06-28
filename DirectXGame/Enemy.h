@@ -10,6 +10,14 @@ class Player;
 class Enemy {
 
 public:
+	// ふるまい
+	enum class Behavior {
+		kWalk,  // 歩行
+		kDeath, // 死
+
+		kUnknown // 不明
+	};
+
 	Enemy();
 	~Enemy();
 
@@ -20,11 +28,23 @@ public:
 	//衝突応答
 	void OnCollision(const Player* player);
 
+	//状態管理
+	void BehaviorWalkInitialize();
+	void BehaviorWalkUpdate();
+
+	void BehaviorDeathInitialize();
+	void BehaviorDeathUpdate();
+
+	bool IsCollisionDisabled() const { return isCollisionDisabled_; }
+
 	// === ゲッター ================================
 
 	KamataEngine::Vector3 GetWorldPosition();
 
 	AABB GetAABB();
+
+	// デスフラグ
+	bool GetIsDead_() const { return isDead_; }
 
 private:
 	// ワールド変換データ
@@ -42,6 +62,19 @@ private:
 	//経過時間
 	float walkTimer_ = 0.0f;
 
+	// デス演出タイマー
+	float deathTimer_ = 0.0f;
+
+	// デスフラグ
+	bool isDead_ = false;
+
+	//ふるまい
+	Behavior behavior_ = Behavior::kWalk;
+	Behavior behaviorRequest_ = Behavior::kUnknown;
+
+	//無効フラグ
+	bool isCollisionDisabled_ = false;
+
 	// === 定数 ============================================
 
 	// 歩行の速さ
@@ -53,6 +86,9 @@ private:
 	static inline const float kWalkMotionAngleEnd = -15.0f;
 	// アニメーション周期となる時間[秒]
 	static inline const float kWalkMotionTime = 0.5f;
+
+	// デス演出時間[秒]
+	static inline const float kDeathDuration = 0.5f;
 
 	// キャラクターの当たり判定サイズ
 	static inline const float kWidth = 0.8f;

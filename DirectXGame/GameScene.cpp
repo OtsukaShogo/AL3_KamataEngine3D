@@ -140,6 +140,15 @@ void GameScene::Update() {
 			newEnemy->Update();
 		}
 
+		// デスフラグの立った敵を削除
+		enemies_.remove_if([](Enemy* enemy) {
+			if (enemy->GetIsDead_()) {
+				delete enemy;
+				return true;
+			}
+			return false;
+		});
+
 		// カメラコントローラ更新
 		cameraController_->Update();
 
@@ -268,6 +277,10 @@ void GameScene::CheckAllCollisons() {
 
 		// 自キャラと敵すべての当たり判定
 		for (Enemy* enemy : enemies_) {
+			if (enemy->IsCollisionDisabled()) {
+				continue; // コリジョン無効の敵はスキップ
+			}
+
 			// 敵の座標
 			aabb2 = enemy->GetAABB();
 
@@ -345,7 +358,7 @@ void GameScene::ChangePhase() {
 		break;
 
 	case Phase::kPlay: // ゲームプレイフェーズ
-		if (player_->GetIsDead_()) {
+		if (player_->GetIsDead()) {
 			// 死亡演出フェーズに切り替え
 			phase_ = Phase::kDeath;
 			// 自キャラの座標を取得
