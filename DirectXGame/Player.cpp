@@ -543,6 +543,10 @@ AABB Player::GetAABB() {
 }
 
 void Player::OnCollision(const Enemy* enemy) {
+	if (IsAttack()) {
+		return;//攻撃中はダメージ無効
+	}
+
 	(void)enemy;
 	// デスフラグを立てる
 	isDead_ = true;
@@ -646,4 +650,11 @@ void Player::BehaviorAttackUpdate(CollisionMapInfo& info) {
 	Matrix4x4 affineMatrixAttack = MakeAffineMatrix(worldTransformAttack_.scale_, worldTransformAttack_.rotation_, worldTransformAttack_.translation_);
 	worldTransformAttack_.matWorld_ = affineMatrixAttack;
 	worldTransformAttack_.TransferMatrix();
+}
+
+bool Player::IsAttack() const {
+	if (behavior_ == Behavior::kAttack) {
+		return true;
+	}
+	return false;
 }

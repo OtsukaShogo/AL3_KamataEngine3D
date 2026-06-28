@@ -1,6 +1,9 @@
+#define NOMINMAX
 #include "Enemy.h"
+#include "Easing.h"
 #include "WorldTransformUpdate.h"
 #include <numbers>
+#include "Player.h"
 
 Enemy::Enemy() {}
 
@@ -27,6 +30,44 @@ void Enemy::Initialize(KamataEngine::Model* model, KamataEngine::Camera* camera,
 }
 
 void Enemy::Update() {
+	// ビヘイビアリクエストの処理
+	if (behaviorRequest_ != Behavior::kUnknown) {
+		behavior_ = behaviorRequest_;
+		switch (behavior_) {
+		case Behavior::kWalk:
+			BehaviorWalkInitialize();
+			break;
+		case Behavior::kDeath:
+			BehaviorDeathInitialize();
+			break;
+		default:
+			break;
+		}
+		behaviorRequest_ = Behavior::kUnknown;
+	}
+
+	// ビヘイビアごとの更新
+	switch (behavior_) {
+	case Behavior::kWalk:
+		BehaviorWalkUpdate();
+		break;
+	case Behavior::kDeath:
+		BehaviorDeathUpdate();
+		break;
+	default:
+		break;
+	}
+
+	// 共通: 行列の更新
+	WorldTransformUpdate(worldTransform_);
+}
+
+void Enemy::BehaviorWalkInitialize() {
+	velocity_ = {-kWalkSpeed, 0.0f, 0.0f};
+	walkTimer_ = 0.0f;
+}
+
+void Enemy::BehaviorWalkUpdate() {
 	// 移動
 	worldTransform_.translation_.x += velocity_.x;
 	worldTransform_.translation_.y += velocity_.y;
@@ -36,12 +77,31 @@ void Enemy::Update() {
 	walkTimer_ += 1.0f / 60.0f;
 
 	// 回転アニメーション
-	float param = std::sin((2.0f * std::numbers::pi_v<float>)*(walkTimer_ / kWalkMotionTime));
+	float param = std::sin((2.0f * std::numbers::pi_v<float>) * (walkTimer_ / kWalkMotionTime));
 	float degree = kWalkMotionAngleStart + kWalkMotionAngleEnd * (param + 1.0f) / 2.0f;
 	worldTransform_.rotation_.x = (std::numbers::pi_v<float> / 180.0f) * degree;
+}
 
-	// 行列の更新
-	WorldTransformUpdate(worldTransform_);
+void Enemy::BehaviorDeathInitialize() {
+	deathTimer_ = 0.0f;
+}
+
+void Enemy::BehaviorDeathUpdate() {
+	// タイマーを加算
+	deathTimer_ += 1.0f / 60.0f;
+
+	float t = std::min(deathTimer_ / kDeathDuration, 1.0f);
+
+	// Y軸まわりの回転をイージングで変化
+	worldTransform_.rotation_.y = EaseOut(std::numbers::pi_v<float> / 2.0f, std::numbers::pi_v<float> * 2.0f, t);
+
+	// X軸まわりの回転をイージングで変化（前のめりに倒れる）
+	worldTransform_.rotation_.x = EaseIn(0.0f, std::numbers::pi_v<float> / 2.0f, t);
+
+	// 一定時間に達したらデスフラグを立てる
+	if (deathTimer_ >= kDeathDuration) {
+		isDead_ = true;
+	}
 }
 
 void Enemy::Draw() {
@@ -74,4 +134,17 @@ AABB Enemy::GetAABB() {
 
 void Enemy::OnCollision(const Player* player) {
 	(void)player;
+	if (behavior_ == Behavior::kDeath) {
+		// 敵がやられているなら何もしない
+		return;
+	}
+
+	// プレイヤーが攻撃中なら敵が死ぬ
+	if (player->IsAttack()) {
+		// 敵の振るまいをデス演出に変更
+		behaviorRequest_ = Behavior::kDeath;
+
+		// コリジョン無効フラグを立てる
+		isCollisionDisabled_ = true;
+	}
 }
